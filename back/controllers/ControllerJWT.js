@@ -40,19 +40,32 @@ const LoginAndRegisterController = {
         const id = await req.params.id
         const data = {}
 
-        const cryptPassword = Bcrypt.hashSync(req.body.password, 14)
-
-        data.name = await req.body.name 
+        data.name = await req.body.name
         data.lastName = await req.body.lastName
         data.email = await req.body.email
-        data.password =  cryptPassword
-
-        if(data.name || data.lastName || data.email || data.password){
-            await Register.findByIdAndUpdate(id, data)
-            res.status(200).send('Usuario atualizado')
-        }else{
-            res.send('Preencha um dos campos para editar')
+        
+        if(req.body.password){
+            data.password = Bcrypt.hashSync(req.body.password, 14)
         }
+
+        if(data.name == undefined){
+            delete data.name
+        }
+
+        if(data.lastName == undefined){
+            delete data.lastName
+        }
+
+        if(data.email == undefined){
+            delete data.email
+        }
+
+        if(data.password == undefined){
+            delete data.password
+        }
+
+        await Register.findByIdAndUpdate(id, data)
+        res.send('Usuário Atualizado')
     }
 
 }
