@@ -1,5 +1,5 @@
 const express = require('express')
-const routes = require('./routes/RoutesJWT')
+const routesUser = require('./routes/RoutesJWT')
 const mongoose = require('mongoose')
 require('dotenv').config()
 
@@ -9,6 +9,6 @@ mongoose.connect(process.env.URL)
     .then(() => console.log('Connected'))
     .catch(() => console.log('Error'))
 
-app.use(routes)
+app.use(routesUser)
 
 app.listen(3000, ()=> { console.log('Server Running') })

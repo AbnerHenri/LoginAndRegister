@@ -1,6 +1,8 @@
 const Register = require('../models/RegisterModel')
 const Bcrypt = require('bcryptjs')
-const { findOne } = require('../models/RegisterModel')
+const Jwt = require('jsonwebtoken')
+
+require('dotenv').config()
 
 
 const LoginAndRegisterController = {
@@ -8,14 +10,25 @@ const LoginAndRegisterController = {
     Login : async function(req,res){
         const email = req.body.email
         const password = req.body.password
+
+        // Seleciona o documento por meio do e-mail
         const selectedUser = await Register.findOne({ email : email })
+        
 
-        const comparePassword = Bcrypt.compare(selectedUser.password, password)
+        const comparePassword = Bcrypt.compareSync(password, selectedUser.password)
 
-        if(comparePassword){
+        const dataUser = {
+            _id : selectedUser._id,
+            admin : selectedUser.admin
+        }
+
+        const token = Jwt.sign(dataUser, process.env.TOKEN)
+
+        if(comparePassword == true){
+            res.header('authorization-token', token)
             res.send('Usuário logado')
         }else{
-            res.status(404).send('Usuário ou senha incorretos')
+            res.status(401).send('Usuário ou senha incorretos')
         }
     },
 
@@ -26,10 +39,16 @@ const LoginAndRegisterController = {
 
         const register = await new Register({
             name : req.body.name,
-            lastName : req.body.name,
+            username : req.body.username,
             email : req.body.email,
             password : cryptPassword
         })
+
+        const verifyUsername = await Register.findOne({ username : register.username})
+
+        if(verifyUsername){
+            res.status(400).send('Username ja cadastrado')
+        }
 
         await register.save()
         res.status(200).send('Usuário cadastrado')
@@ -41,7 +60,7 @@ const LoginAndRegisterController = {
         const data = {}
 
         data.name = await req.body.name
-        data.lastName = await req.body.lastName
+        data.username = await req.body.username
         data.email = await req.body.email
         
         if(req.body.password){
@@ -52,7 +71,7 @@ const LoginAndRegisterController = {
             delete data.name
         }
 
-        if(data.lastName == undefined){
+        if(data.username == undefined){
             delete data.lastName
         }
 
