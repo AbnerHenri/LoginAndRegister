@@ -44,8 +44,10 @@ const LoginAndRegisterController = {
             password : cryptPassword
         })
 
+        // Procura o usename no banco de dados
         const verifyUsername = await Register.findOne({ username : register.username})
 
+        // Se ja possuir um username igual ele retorna erro 
         if(verifyUsername){
             res.status(400).send('Username ja cadastrado')
         }
