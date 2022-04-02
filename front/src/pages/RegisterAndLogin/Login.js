@@ -27,7 +27,8 @@ function Login() {
               <div ref={animationContainer}></div>
             </div>
 
-            <div className={classes.Form} method='POST' action='/'>
+            <div className={classes.FormDiv}>
+              <form className={classes.FormInput} method='POST' action='http://localhost:3000/'>
                 <TextField name='email' variant='standard' label='E-mail' className={classes.InputText}></TextField>
                 <TextField type='password' name='password' variant='standard' label='Senha' className={classes.InputText}></TextField>
                 <Button type='submit' color='Primary' variant='contained' className={classes.Button}>Enviar</Button>
@@ -36,6 +37,7 @@ function Login() {
                     Ainda não possuí cadastro? 
                     <Link href='/register' style={{cursor : 'pointer'}}> Clique Aqui</Link>
                   </Typography>
+              </form>
             </div>
           </div>
       </div>

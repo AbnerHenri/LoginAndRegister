@@ -26,14 +26,19 @@ const Styles = makeStyles({
         backgroundColor : '#191919',
     },
 
-    Form : {
+    FormDiv : {
+        width : '35%',
+        height : '100%',
+        backgroundColor : '#ffffff',
+    },
+
+    FormInput : {
         display : 'flex',
         flexDirection : 'column',
         justifyContent : 'center',
         alignItems : 'center',
-        width : '35%',
-        height : '100%',
-        backgroundColor : '#ffffff',
+        width : '100%',
+        height : '100%'
     },
     
     InputText : {
