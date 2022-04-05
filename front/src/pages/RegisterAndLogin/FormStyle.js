@@ -54,6 +54,12 @@ const Styles = makeStyles({
     Link : {
         position : 'relative',
         top : 85,
+    },
+
+    ErrorMessage : {
+        position : 'relative',
+        top : 70,
+        textAlign : 'center'
     }
 })
 

@@ -8,28 +8,35 @@ require('dotenv').config()
 const LoginAndRegisterController = {
 
     Login : async function(req,res){
-        const email = req.body.email
-        const password = req.body.password
+        const email = await req.body.email
+        const password = await req.body.password
+        console.log(password)
 
         // Seleciona o documento por meio do e-mail
         const selectedUser = await Register.findOne({ email : email })
-        
 
-        const comparePassword = Bcrypt.compareSync(password, selectedUser.password)
-
-        const dataUser = {
-            _id : selectedUser._id,
-            admin : selectedUser.admin
-        }
-
-        const token = Jwt.sign(dataUser, process.env.TOKEN)
-
-        if(comparePassword == true){
-            res.header('authorization-token', token)
-            res.send('Usuário logado')
+        if(!selectedUser){
+            res.cookie('loginMessage=E-mail ou senha incorretos')
+            res.redirect('http://localhost:3001/login')  
         }else{
-            res.status(401).send('Usuário ou senha incorretos')
-        }
+            const comparePassword = Bcrypt.compareSync(password, selectedUser.password)
+            const dataUser = {
+                _id : selectedUser._id,
+                admin : selectedUser.admin
+            }
+    
+            const token = Jwt.sign(dataUser, process.env.TOKEN)
+            const username = selectedUser.username
+    
+            if(comparePassword == true){
+                res.setHeader('token', token)
+                res.redirect(`http://localhost:3001/users/${username}`)
+            }else{
+                res.status(401)
+                res.cookie('loginMessage=E-mail ou senha incorretos')
+            }
+        }     
+        
     },
 
     Register : async function(req,res){
@@ -42,11 +49,17 @@ const LoginAndRegisterController = {
         const verifyUsername = await Register.findOne({ username : username})
         const verifyEmail = await Register.findOne({ email : email })
 
+        // const message = 'Usuário ou E-mail ja cadastrado'
+        
+
         // Se ja possuir um username igual ele retorna erro 
         if(verifyUsername || verifyEmail){
-            res.status(400).send('Username ou E-mail ja cadastrado')
+            res.status(401)
+            res.cookie('message=Username ou E-mail já cadastrado')
+            res.redirect('http://localhost:3001/register')
         }else{
-            let password = req.body.password
+        const password = req.body.password
+        console.log(password)
         const cryptPassword = Bcrypt.hashSync(password, 14)
 
 
@@ -59,7 +72,8 @@ const LoginAndRegisterController = {
 
 
         await register.save()
-        res.status(200).send('Usuário cadastrado')
+        res.status(200)
+        res.redirect('http://localhost:3001/login')
     }
 
         
@@ -104,37 +118,6 @@ const LoginAndRegisterController = {
         await Register.findByIdAndUpdate(id, data)
         res.send('Usuário Atualizado')
     },
-
-    DataUsers : async function(req,res){
-        const id = await req.params.id
-        const selectedUser = await Register.find({ _id : id})
-
-        DataUser = {
-            name : selectedUser.name,
-            userName : selectedUser.username,
-            email : selectedUser.email,
-        }
-
-        res.json(DataUser)
-    },
-
-    DataAdmin : async function(req,res){
-        const users = await Register.find()
-        console.log(users)
-
-        const MyUsers = users.map( data => {
-            const Data = {
-                name : data.name,
-                username : data.username,
-                email : data.email,
-            }
-
-            return Data
-        })
-
-        res.json(MyUsers)
-    }
-
 }
 
 module.exports = LoginAndRegisterController
