@@ -18,18 +18,20 @@ const LoginAndRegisterController = {
         if(!selectedUser){
             res.cookie('loginMessage=E-mail ou senha incorretos')
             res.redirect('http://localhost:3001/login')  
-        }else{
+        }
+        
+        if(selectedUser){
             const comparePassword = Bcrypt.compareSync(password, selectedUser.password)
             const dataUser = {
                 _id : selectedUser._id,
                 admin : selectedUser.admin
             }
     
-            const token = Jwt.sign(dataUser, process.env.TOKEN)
+            const MyToken = Jwt.sign(dataUser, process.env.TOKEN)
             const username = selectedUser.username
-    
+
             if(comparePassword == true){
-                res.setHeader('token', token)
+                res.header(MyToken)
                 res.redirect(`http://localhost:3001/users/${username}`)
             }else{
                 res.status(401)
