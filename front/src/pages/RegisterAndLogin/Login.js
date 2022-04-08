@@ -10,6 +10,10 @@ function Login() {
 
   const classes = Styles()
 
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
+
   let animationContainer = React.createRef()
 
   useEffect(()=>{
@@ -20,24 +24,54 @@ function Login() {
 
   }, [])
 
- 
+  const data = {
+    email : email,
+    password : password
+  }
+
+  const options = { 
+    method : 'POST',
+    headers : new Headers({'Content-type' : 'application/json'}),
+    body : JSON.stringify(data)
+  }
+
+  function MyPost(e){
+    e.preventDefault()
+
+    fetch('http://localhost:3000/', options)
+      .then( res => res.json())
+      .then( data => {
+
+        if(data.token){
+          localStorage.setItem('token', data.token)
+          window.location.href = `http://localhost:3001/users/${data.username}`
+        }else{
+          setMessage(data.msg)
+        }
+      })
+  }
+  
 
   return(
       <div>
           <div className={classes.Main}>
             <div className={classes.Image}>
               <div ref={animationContainer}></div>
-            </div>
+          </div>
 
             <div className={classes.FormDiv}>
 
-              <form className={classes.FormInput} method='POST' action='http://localhost:3000/'>
+              <Typography color='error' className={classes.ErrorMessage}>{message}</Typography>
+
+              <form className={classes.FormInput}>
 
                 <TextField 
                     name='email' 
                     variant='standard' 
                     label='E-mail' 
-                    className={classes.InputText}>
+                    className={classes.InputText}
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}>
                 </TextField>
 
                 <TextField 
@@ -45,7 +79,9 @@ function Login() {
                     name='password' 
                     variant='standard' 
                     label='Senha' 
-                    className={classes.InputText}>
+                    className={classes.InputText}
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}>
                 </TextField>
 
                 <Button 
@@ -53,7 +89,7 @@ function Login() {
                     color='primary' 
                     variant='contained' 
                     className={classes.Button}
-                    onClick={()=> deleteAllCookies()}>
+                    onClick={(e) => MyPost(e)}>
                     Enviar
                 </Button>
 

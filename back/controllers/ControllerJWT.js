@@ -31,11 +31,11 @@ const LoginAndRegisterController = {
             const username = selectedUser.username
 
             if(comparePassword == true){
-                res.header(MyToken)
-                res.redirect(`http://localhost:3001/users/${username}`)
+                    res.json({ token : MyToken, username : username })
+                    // res.redirect(`http://localhost:3001/users/${username}`)
             }else{
                 res.status(401)
-                res.cookie('loginMessage=E-mail ou senha incorretos')
+                res.json({ msg : 'E-mail ou senha incorretos'})
             }
         }     
         

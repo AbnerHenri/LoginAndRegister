@@ -17,6 +17,7 @@ function Login() {
       container : animationContainer.current,
       animationData : Animation
     })
+
   }, [])
  
 
@@ -28,8 +29,6 @@ function Login() {
             </div>
 
             <div className={classes.FormDiv} >
-
-              <Typography color='error' className={classes.ErrorMessage}>{message}</Typography>
 
               <form className={classes.FormInput} method='POST' action='http://localhost:3000/register'>
 
@@ -66,8 +65,7 @@ function Login() {
                     type='submit' 
                     color='primary' 
                     variant='contained' 
-                    className={classes.Button}
-                    onClick={()=> deleteAllCookies()}>
+                    className={classes.Button}>
                     Enviar
                 </Button>
               
