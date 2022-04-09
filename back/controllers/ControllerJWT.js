@@ -1,6 +1,7 @@
 const Register = require('../models/RegisterModel')
 const Bcrypt = require('bcryptjs')
 const Jwt = require('jsonwebtoken')
+const { findOne } = require('../models/RegisterModel')
 
 require('dotenv').config()
 
@@ -10,7 +11,7 @@ const LoginAndRegisterController = {
     Login : async function(req,res){
         const email = await req.body.email
         const password = await req.body.password
-        console.log(password)
+
 
         // Seleciona o documento por meio do e-mail
         const selectedUser = await Register.findOne({ email : email })
@@ -83,43 +84,57 @@ const LoginAndRegisterController = {
 
     Edit : async function(req,res){
 
-        const id = await req.params.id
-        const data = {}
+        const newUrl = await req.body.url
 
+        const data = { 
+            name : await req.body.name,
+            username : await req.body.username,
+            email : await req.body.email
 
-        data.name = await req.body.name
-        data.username = await req.body.username
-        data.email = await req.body.email
-
-        const verifyUsername = await findOne({ username : data.username})
-
-        if(!verifyUsername){
-            res.send('Username já cadastrado')
-        }
-        
-        if(req.body.password){
-            data.password = Bcrypt.hashSync(req.body.password, 14)
         }
 
-        if(data.name == undefined){
-            delete data.name
-        }
+        const verifyUsername = await Register.findOne({ username : data.username })
+        const verifyEmail = await Register.findOne({ email : data.email })
 
-        if(data.username == undefined){
-            delete data.lastName
-        }
+        if(verifyUsername || verifyEmail){
+            res.json({ msgError : 'já cadastrado'})
+        }else{
 
-        if(data.email == undefined){
-            delete data.email
-        }
+            const selectedUser = await Register.findOne({ username : newUrl })
 
-        if(data.password == undefined){
-            delete data.password
-        }
 
-        await Register.findByIdAndUpdate(id, data)
-        res.send('Usuário Atualizado')
+                if(data.name == undefined){
+                    delete data.name
+                }
+
+                if(data.username == undefined){
+                    delete data.username
+                }
+
+                if(data.email == undefined){
+                    delete data.email
+                }
+
+                const id = selectedUser._id
+                const NewId = id.toString()
+
+                await Register.findByIdAndUpdate(NewId, data)
+
+                res.json({ url : data.username })
+        }
     },
+
+    userPage : async function(req,res){
+        const username = await req.body.username
+        const selectedUser = await Register.findOne({ username : username })
+
+        res.json({
+            name : selectedUser.name,
+            username : selectedUser.username,
+            email : selectedUser.email
+        })
+
+    }
 }
 
 module.exports = LoginAndRegisterController
