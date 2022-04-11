@@ -1,7 +1,6 @@
 const Register = require('../models/RegisterModel')
 const Bcrypt = require('bcryptjs')
 const Jwt = require('jsonwebtoken')
-const { findOne } = require('../models/RegisterModel')
 
 require('dotenv').config()
 
@@ -17,12 +16,12 @@ const LoginAndRegisterController = {
         const selectedUser = await Register.findOne({ email : email })
 
         if(!selectedUser){
-            res.cookie('loginMessage=E-mail ou senha incorretos')
-            res.redirect('http://localhost:3001/login')  
-        }
-        
-        if(selectedUser){
+            res.status(200)
+            res.json({ msg : 'E-mail ou senha incorretos'})
+        }else{
+
             const comparePassword = Bcrypt.compareSync(password, selectedUser.password)
+
             const dataUser = {
                 _id : selectedUser._id,
                 admin : selectedUser.admin
@@ -32,54 +31,51 @@ const LoginAndRegisterController = {
             const username = selectedUser.username
 
             if(comparePassword == true){
-                    res.json({ token : MyToken, username : username })
-                    // res.redirect(`http://localhost:3001/users/${username}`)
+                res.status(200)
+                res.json({ token : MyToken, username : username })
             }else{
-                res.status(401)
+                res.status(200)
                 res.json({ msg : 'E-mail ou senha incorretos'})
             }
+            
         }     
         
     },
 
     Register : async function(req,res){
 
+        const name = await req.body.name
         const username = await req.body.username
         const email = await req.body.email
+        const password = await req.body.password
 
 
         // Procura o usename no banco de dados
         const verifyUsername = await Register.findOne({ username : username})
         const verifyEmail = await Register.findOne({ email : email })
 
-        // const message = 'Usuário ou E-mail ja cadastrado'
-        
+        console.log(verifyEmail + ' | ' + verifyUsername)
 
         // Se ja possuir um username igual ele retorna erro 
-        if(verifyUsername || verifyEmail){
+        if(verifyEmail || verifyUsername){
             res.status(401)
-            res.cookie('message=Username ou E-mail já cadastrado')
-            res.redirect('http://localhost:3001/register')
+            res.json({ msgError : 'Username ou E-mail já cadastrado'}) 
         }else{
-        const password = req.body.password
-        console.log(password)
-        const cryptPassword = Bcrypt.hashSync(password, 14)
-
-
-        const register = await new Register({
-            name : req.body.name,
-            username : username,
-            email : email,
-            password : cryptPassword
-        })
-
-
-        await register.save()
-        res.status(200)
-        res.redirect('http://localhost:3001/login')
-    }
-
         
+            const cryptPassword = Bcrypt.hashSync(password, 14)
+
+            const register = await new Register({
+                name : name,
+                username : username,
+                email : email,
+                password : cryptPassword
+            })
+    
+            await register.save()
+            res.status(200)
+            res.json({ msgSucess : 'Salvo'})
+        }
+
     },
 
     Edit : async function(req,res){

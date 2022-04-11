@@ -6,7 +6,7 @@ const Controllers = require('../controllers/ControllerJWT')
 router.use(cors())
 
 router.post('/', express.json(), Controllers.Login)
-router.post('/register', express.urlencoded({ extended : true}), Controllers.Register)
+router.post('/register', express.json(), Controllers.Register)
 router.post('/userpage', express.json(), Controllers.userPage)
 
 router.put('/edit', express.json(), Controllers.Edit)

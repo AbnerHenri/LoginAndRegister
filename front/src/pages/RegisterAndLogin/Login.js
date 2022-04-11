@@ -12,7 +12,6 @@ function Login() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
 
   let animationContainer = React.createRef()
 
@@ -21,7 +20,6 @@ function Login() {
       container : animationContainer.current,
       animationData : Animation
     })
-
   }, [])
 
   const data = {
@@ -35,18 +33,24 @@ function Login() {
     body : JSON.stringify(data)
   }
 
+  const message = localStorage.getItem('msg')
+
   function MyPost(e){
     e.preventDefault()
+
+    console.table(password, email)
 
     fetch('http://localhost:3000/', options)
       .then( res => res.json())
       .then( data => {
 
         if(data.token){
+          localStorage.clear()
           localStorage.setItem('token', data.token)
           window.location.href = `http://localhost:3001/users/${data.username}`
         }else{
-          setMessage(data.msg)
+          window.location.reload()
+          localStorage.setItem('msg', data.msg)
         }
       })
   }

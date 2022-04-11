@@ -73,8 +73,13 @@ async function EditElement(e){
                 data.username = edit
                 data.url = newUrl
 
-        default:
             break;
+
+        default:
+                data.name = undefined
+                data.email = undefined
+                data.username = undefined
+                data.url = undefined
     }
 
     console.log(data)
@@ -104,7 +109,7 @@ async function EditElement(e){
   return(
       <div style={CardStyle}>
           <Typography variant='h6'><strong>{props.data} : </strong>{props.dataUser}</Typography>
-          <img src={Edit} alt='edit' onClick={handleOpen} style={{width : 50}}></img>
+          <img src={Edit} alt='edit' onClick={handleOpen} style={{width : 50, cursor : 'pointer'}}></img>
           <Modal open={open} onClose={handleClose}>
                 <Box style={BoxStyle}>
                     <Typography variant='h5'style={{marginBottom : 30}}>Edite seu {props.data}</Typography>
